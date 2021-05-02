@@ -24,7 +24,7 @@ More information can be found on the [NYUv2 dataset site](https://cs.nyu.edu/~si
 # Structure
 - ```models/``` stores the models that we have trained, you can store your new model there.
 - ```utils/``` stores the python classes and methods that we call in the codes.
--```data/``` should store the ```nyu_data.zip``` that you have to download (See Dataset section).
+- ```data/``` should store the ```nyu_data.zip``` that you have to download (See Dataset section).
 
 # Credits
 Nathan Silberman and NYU team
