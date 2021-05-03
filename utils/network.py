@@ -6,11 +6,12 @@ from utils.netMixin import NetMixin
 '''
 8 layer encoder-decoder
 '''
-class depth8(nn.Module, NetMixin):
+class depth8sig(nn.Module, NetMixin):
 	def __init__(self, hidden_layer=8):
-		super(depth8, self).__init__()
+		super(depth8sig, self).__init__()
 		self.hidden_layer = hidden_layer
 		self.encoder = nn.Sequential(
+
 			nn.Conv2d(3, 128, 4, stride=2, padding=2),
 			nn.BatchNorm2d(128),
 			nn.LeakyReLU(0.2, inplace=True),
@@ -77,10 +78,17 @@ class depth8(nn.Module, NetMixin):
 			nn.BatchNorm2d(1),
 			nn.LeakyReLU(0.2, inplace=True),
 		)
+		self.sigmoid = nn.Sequential(
+			nn.Sigmoid()
+		)
 
 	def forward(self, x):
 		x = self.encoder(x)
 		x = self.decoder(x)
+		
+		x = x.view(-1, 1, 480*640)
+		x = self.sigmoid(x)
+		x = x.view(-1, 1, 480, 640)
 		return x
 
 '''
@@ -98,60 +106,28 @@ class RMSELoss(nn.Module):
 Depth Est loss
 '''
 class depthEstLoss(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.mse = nn.MSELoss()
+	def __init__(self):
+		super().__init__()
+		self.mse = nn.MSELoss()
 
-    def forward(self,yhat,y):
-        yhat = yhat*255
-        y = y*255
-        no_ele = torch.numel(y)
-        return self.mse(yhat,y)-((torch.sum(yhat-y)**2)*0.5/(no_ele**2))
+	def forward(self,yhat,y):
+		yhat = yhat*255
+		y = y*255
+		no_ele = torch.numel(y)
+		return self.mse(yhat,y)-((torch.sum(yhat-y)**2)*0.5/(no_ele**2))
 '''
 Depth Est loss log
 '''
 class depthEstLossLog(nn.Module):
-    def __init__(self):
-        super().__init__()
-        self.mse = nn.MSELoss()
+	def __init__(self):
+		super().__init__()
+		self.mse = nn.MSELoss()
 
-    def forward(self,yhat,y):
-        # print('this shit')
-        # print(torch.min(y))
-        yhat = yhat*255
-        y = y*255
-        lam = 1e-1
-        # print(yhat)
-        # print(y)
-        # print(yhat.shape)
-        # print(y.shape)
-        # yhat= yhat + lam
-        # y = y + lam
-        # checkyhat = yhat<0
-        # checky = y<0
-        # print(torch.all(checky))
-        # print(torch.all(checkyhat))
-        # print(torch.min(yhat))
-        # print('changed')
-        # print(lam)
-        # print(torch.max(torch.log(yhat)))
-        # print(torch.max(torch.log(y)))
-        no_ele = torch.numel(y)
-        # return self.mse(torch.log(yhat),torch.log(y))-((torch.sum(torch.log(yhat)-torch.log(y))**2)*0.5/(no_ele**2))
-        
-        
-        d = torch.log(yhat)-torch.log(y)
-        # print(no_ele)
-        # print('this is d')
-        # print(d)
-        # help = torch.clamp(d,min = 0,max = 2.406)
-        # print(help)
-        # print(torch.all(help<2.5))
-        # print(torch.max(help))
-        # print(torch.sum(help))
-        # print('this is nan')
-        # print((torch.sum(d)**2))
-        # print('sdfafaf')
-        # print((torch.sum(d)**2)*0.5/(no_ele**2))
-        return self.mse(torch.log(yhat),torch.log(y))-((torch.sum(d)**2)*0.5/(no_ele**2))
-        
+	def forward(self,yhat,y):
+		yhat = yhat*255
+		y = y*255
+		lam = 1e-1
+		no_ele = torch.numel(y)
+		d = torch.log(yhat)-torch.log(y)
+		return self.mse(torch.log(yhat),torch.log(y))-((torch.sum(d)**2)*0.5/(no_ele**2))
+		

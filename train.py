@@ -44,7 +44,7 @@ torch.cuda.manual_seed(100)
 np.random.seed(100)
 
 #---------- get args ----------#
-parser = argparse.ArgumentParser(description="Train image classifier model")
+parser = argparse.ArgumentParser(description="Train depth estimation model")
 parser.add_argument("--save_location", default='models/new_model.pt', help="Location to save model")
 parser.add_argument("--hidden_layers", default=8, type=int, help="Number of hidden_layers (channels)")
 parser.add_argument("--learning_rate", default=0.001, type=float, help="Learning rate")
@@ -85,7 +85,7 @@ val_xy = train_data[val_start:val_end]
 test_xy = train_data[test_start:]
 
 #-------- init model for training --------#
-model = depth8(hidden_layers)
+model = depth8sig(hidden_layers)
 
 #--------- init dataloaders for training ----------#
 datasets = {
@@ -96,7 +96,7 @@ datasets = {
 trainloader, validloader, _ = get_dataloaders(datasets, {'batch_size': 16})
 
 #--------- set hyperparams --------------#
-criterion = depthEstLoss()
+criterion = depthEstLossLog()
 optimizer = torch.optim.RMSprop(model.parameters(), weight_decay=weight_decay, lr=lr)
 
 #-------- training loop ----------#

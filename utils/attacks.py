@@ -86,7 +86,7 @@ class targetted_object_noise_sample24(object):
 		epsilon_mat = np.asarray(([[ np.random.normal()*(self.eps/8)
 									for i in range(img_cols)]
 									for j in range(img_rows)]))  
-		epsilon_mat[150:400, 350:550] = [[np.random.normal()*self.eps for i in range (200)] for i in range(250)]
+		epsilon_mat[190:290, 250:350] = [[np.random.normal()*self.eps for i in range (100)] for i in range(100)]
 
 		if self.verbose:
 			print('epsilon has values?: ', not np.all(epsilon_mat<=0))
@@ -115,7 +115,7 @@ class targetted_object_noise_sample30(object):
 		epsilon_mat = np.asarray(([[ np.random.normal()*(self.eps/8)
 								  for i in range(img_cols)]
 								  for j in range(img_rows)]))  
-		epsilon_mat[0:200, 250:425] = [[np.random.normal()*self.eps for i in range (175)] for i in range(200)]
+		epsilon_mat[200:450, 500:640] = [[np.random.normal()*self.eps for i in range (140)] for i in range(250)]
 
 		if self.verbose:
 			print('epsilon has values?: ', not np.all(epsilon_mat<=0))

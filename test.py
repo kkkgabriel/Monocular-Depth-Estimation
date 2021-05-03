@@ -44,8 +44,8 @@ torch.cuda.manual_seed(100)
 np.random.seed(100)
 
 #---------- get args ----------#
-parser = argparse.ArgumentParser(description="Train image classifier model")
-parser.add_argument("model_location", help="Location of first layer model")
+parser = argparse.ArgumentParser(description="Test the depth estimator.")
+parser.add_argument("model_location", help="Location model")
 parser.add_argument("--device", default='cpu', help="Device to test on, default at 'cpu'")
 parser.add_argument("--batch_size", default=16, type=int, help="Batch size to run test on, default at '16'")
 
@@ -78,10 +78,11 @@ train_xy = train_data[:train_end]
 val_xy = train_data[val_start:val_end]
 test_xy = train_data[test_start:]
 
+
 #--------- get trained model ----------#
-trained_model = depth8()
+trained_model = depth8sig()
 trained_model.load_model(model_location, device=device)
-criterion = depthEstLoss()
+criterion = depthEstLossLog()
 
 
 #--------- init dataloaders for testing ----------#
@@ -95,5 +96,5 @@ _, _, testloader = get_dataloaders(datasets, {'batch_size': batch_size})
 # Test the model and get results
 advanced = True # get advanced metrics instead of just test loss
 scores = trained_model.test_model(testloader, criterion, advanced=advanced, device=device)
-metrics = ['Average Test loss', 'avg_d1', 'avg_d2', 'avg_d3', 'avg_rms_log', 'avg_abs_rel', 'avg_sq_rel', 'avg_rms_log10']
+metrics = ['Average Test loss', 'Average d1 Score', 'Average d2 Score', 'Average d3 Score', 'Average RMS Error', 'Absolute Relative Error', 'Average Squared Relative Difference', 'Average Mean log10 Error']
 print(pd.DataFrame(data={'Metrics': metrics, 'Scores':scores}))

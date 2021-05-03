@@ -37,21 +37,15 @@ import warnings
 warnings.filterwarnings("ignore")
 
 #---------- get args ----------#
-parser = argparse.ArgumentParser(description="Train image classifier model")
-parser.add_argument("model_location", help="Location of first layer model")
+parser = argparse.ArgumentParser(description="Predict depth on a sample image from the test set.")
+parser.add_argument("model_location", help="Location model")
 parser.add_argument("index", type=int, help="index of sample in testset to run test on")
+parser.add_argument("--device", default='cpu', help='cuda or cpu')
 
 args = parser.parse_args()
 model_location = args.model_location
 index  = args.index
-
-if index < 0:
-	print('ERROR: Input a index > 0')
-	exit()
-
-if index > len(test_xy):
-	print('ERROR: Input a index, where 0 > index > {}'.format(len(test_xy)))
-	exit()
+device = args.device
 
 # init the torch seeds
 torch.backends.cudnn.deterministic = True
@@ -84,11 +78,19 @@ train_xy = train_data[:train_end]
 val_xy = train_data[val_start:val_end]
 test_xy = train_data[test_start:]
 
+if index < 0:
+	print('ERROR: Input a index > 0')
+	exit()
+
+if index > len(test_xy):
+	print('ERROR: Input a index, where 0 > index > {}'.format(len(test_xy)))
+	exit()
+
 
 #--------- get trained model ----------#
-trained_model = depth8()
+trained_model = depth8sig()
 trained_model.load_model(model_location, device=device)
-criterion = depthEstLoss()
+criterion = depthEstLossLog()
 
 #----------- init testset------------#
 testset = depth_est_dataset_v2(test_xy, zf)

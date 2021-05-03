@@ -117,8 +117,8 @@ class NetMixin():
 		d3 = (thresh < 1.25**3).astype(int).mean()
 
 
-		rms_log = (np.log(y) - np.log(pred)) ** 2
-		rms_log = np.sqrt(rms_log.mean())
+		rms = (y - pred) ** 2
+		rms = np.sqrt(rms.mean())
 
 		abs_rel = np.mean(np.abs(y-pred)/y)
 		sq_rel = np.mean((y-pred)**2/y)
@@ -135,8 +135,8 @@ class NetMixin():
 			print('\n---------thresh<1.25-----------')
 			print(thresh<1.25)
 			# print('\nResults: d1, d2, d3\n', d1, d2, d3, '\n')
-			print('\nResults: d1, d2, d3, rms_log, abs_rel, sq_rel, rms_log10 \n', d1,d2,d3,rms_log,abs_rel,sq_rel,rms_log10, '\n')
-		return d1, d2, d3, rms_log, abs_rel, sq_rel, rms_log10
+			print('\nResults: d1, d2, d3, rms_log, abs_rel, sq_rel, rms_log10 \n', d1,d2,d3,rms,abs_rel,sq_rel,rms_log10, '\n')
+		return d1, d2, d3, rms, abs_rel, sq_rel, rms_log10
 		# return d1, d2, d3
 
 	'''
@@ -156,7 +156,7 @@ class NetMixin():
 		self.to(device)
 		self.eval()
 
-		total_d1, total_d2, total_d3, total_rms_log, total_abs_rel, total_sq_rel, total_rms_log10  = 0, 0, 0, 0, 0, 0, 0
+		total_d1, total_d2, total_d3, total_rms, total_abs_rel, total_sq_rel, total_rms_log10  = 0, 0, 0, 0, 0, 0, 0
 
 		training_loss = 0
 		training_size = []
@@ -167,11 +167,11 @@ class NetMixin():
 				output = self.forward(X)
 
 				if advanced:
-					d1, d2, d3, rms_log, abs_rel, sq_rel, rms_log10 = self.metrics_eval(output, y, device=device, verbose=False)
+					d1, d2, d3, rms, abs_rel, sq_rel, rms_log10 = self.metrics_eval(output, y, device=device, verbose=False)
 					total_d1 += d1
 					total_d2 += d2
 					total_d3 += d3
-					total_rms_log += rms_log
+					total_rms += rms
 					total_abs_rel += abs_rel
 					total_sq_rel += sq_rel
 					total_rms_log10 += rms_log10
@@ -191,11 +191,11 @@ class NetMixin():
 			avg_d1 = total_d1 / training_samples
 			avg_d2 = total_d2 / training_samples
 			avg_d3 = total_d3 / training_samples
-			avg_rms_log = total_rms_log / training_samples
+			avg_rms = total_rms / training_samples
 			avg_abs_rel = total_abs_rel / training_samples
 			avg_sq_rel = total_sq_rel / training_samples
 			avg_rms_log10 = total_rms_log10 / training_samples
-			return average_validation_loss, avg_d1, avg_d2, avg_d3, avg_rms_log, avg_abs_rel, avg_sq_rel, avg_rms_log10
+			return average_validation_loss, avg_d1, avg_d2, avg_d3, avg_rms, avg_abs_rel, avg_sq_rel, avg_rms_log10
 
 		return average_validation_loss
 
